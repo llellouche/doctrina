@@ -16,7 +16,7 @@ services:
       retries: 3
       start_period: 30s
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-api-platform}:${POSTGRES_PASSWORD:-!ChangeMe!}@database:5432/${POSTGRES_DB:-api}?serverVersion=${POSTGRES_VERSION:-13}
+      DATABASE_URL: mysql://${DATABASE_USER:-api-platform}:${MYSQL_PASSWORD:-!ChangeMe!}@database:3306/${DATABASE_NAME:-doctrina}?serverVersion=${DATABASE_VERSION:-8}
       TRUSTED_PROXIES: ${TRUSTED_PROXIES:-127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16}
       TRUSTED_HOSTS: ^${SERVER_NAME:-example\.com|localhost}|caddy$$
       MERCURE_URL: ${CADDY_MERCURE_URL:-http://caddy/.well-known/mercure}
@@ -63,17 +63,17 @@ services:
         protocol: udp
 
   database:
-    container_name: api-database
-    image: postgres:${POSTGRES_VERSION:-13}-alpine
+    image: mysql:${DATABASE_VERSION:-8}
+    deploy:
+      restart_policy:
+        condition: on-failure
     environment:
-      - POSTGRES_DB=${POSTGRES_DB:-api}
-      # You should definitely change the password in production
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-!ChangeMe!}
-      - POSTGRES_USER=${POSTGRES_USER:-api-platform}
-    volumes:
-      - db_data:/var/lib/postgresql/data:rw
-      # you may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
-      # - ./api/docker/db/data:/var/lib/postgresql/data:rw
+      - MYSQL_ROOT_PASSWORD=${DATABASE_ROOT_PASSWORD:-root}
+      - MYSQL_DATABASE=${DATABASE_NAME:-doctrina}
+      - MYSQL_USER=${DATABASE_USER:-api-platform}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-!ChangeMe!}
+    ports:
+      - '3300:3306'
 
 volumes:
   php_socket:
