@@ -35,6 +35,9 @@ class User
     #[ORM\Column(type: 'string', nullable: true)]
     private $authToken;
 
+    #[ORM\Column(type: 'string', nullable: false)]
+    private $role;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -99,4 +102,21 @@ class User
 
         return $this;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getRole()
+    {
+        return $this->role;
+    }
+
+    /**
+     * @param mixed $role
+     */
+    public function setRole($role): void
+    {
+        $this->role = $role;
+    }
+
 }

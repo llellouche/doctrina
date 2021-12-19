@@ -2,8 +2,10 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 use App\Controller\ArticleSearchController;
 use App\Repository\ArticleRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -13,7 +15,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     itemOperations: [
         'get',
-        'post',
         'put',
         'search_articles' => [
             'method' => 'get',
@@ -26,6 +27,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     denormalizationContext: ["groups" => ["write"]],
     normalizationContext: ["groups" => ["read"]],
 )]
+#[ApiFilter(BooleanFilter::class, properties: ['draft'])]
 class Article
 {
     #[ORM\Id]
@@ -47,7 +49,7 @@ class Article
     #[Groups(["write", "read"])]
     private $content;
 
-    #[ORM\Column(type: 'boolean')]
+    #[ORM\Column(type: 'boolean',  nullable: false)]
     #[Groups(["write", "read"])]
     private $draft;
 
@@ -84,6 +86,7 @@ class Article
         $this->tags      = [];
         $this->comments  = [];
         $this->reactions = [];
+        $this->draft     = false;
     }
 
     public function getId(): ?int
