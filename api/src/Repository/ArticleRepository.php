@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Article;
+use App\Entity\Tag;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -19,22 +20,27 @@ class ArticleRepository extends ServiceEntityRepository
         parent::__construct($registry, Article::class);
     }
 
-    // /**
-    //  * @return Article[] Returns an array of Article objects
-    //  */
-    /*
-    public function findByExampleField($value)
+     /**
+      * @return Article[] Returns an array of Article objects
+      */
+    public function findArticles(string $searchName, array $tags = [])
     {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('a.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        $qb = $this->createQueryBuilder('a')
+            ->andWhere('a.name LIKE :searchName')
+            ->setParameter('searchName', $searchName . '%');
+
+        foreach ($tags as $i => $tag) {
+            $qb->innerJoin('a.tags', 't' . $i)
+                ->andWhere('t' . $i . '.title = :title' . $i)
+                ->setParameter('title' . $i, $tag);
+        }
+
+        return $qb
+        ->orderBy('a.id', 'ASC')
+        ->setMaxResults(25)
+        ->getQuery()
+        ->getResult();
     }
-    */
 
     /*
     public function findOneBySomeField($value): ?Article

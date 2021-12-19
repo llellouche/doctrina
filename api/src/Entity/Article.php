@@ -4,13 +4,25 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
+use App\Controller\ArticleSearchController;
 use App\Repository\ArticleRepository;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
 #[ApiResource(
+    itemOperations: [
+        'get',
+        'post',
+        'put',
+        'search_articles' => [
+            'method' => 'get',
+            'path' => '/articles/search/{search}',
+            'controller' => ArticleSearchController::class,
+            'normalization_context' => ['groups' => ["read"]],
+            "read" => false
+        ]
+    ],
     denormalizationContext: ["groups" => ["write"]],
     normalizationContext: ["groups" => ["read"]],
 )]
